@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}My Top Dishita Memories{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="heading">Best Dishita Moments</h1>
+  <p class="description">These are my all-time fav Dishita Moments. I love youuu!!!.</p>
+   {% for memory in memoryList %}
+  <div class="card" >
+    <div class="front" style="background-image: url('{{ memory.image }}');">
+        <p class="large">{{memory.ranking}}</p>
+    </div>
+    <div class="back">
+      <div>
+    <div class="title">{{memory.title}}</div>
+        <div class="rating">
+            <label>{{memory.rating}}</label>
+          <i class="fas fa-star star"></i>
+        </div>
+          <p class="review">"{{memory.review}}"</p>
+        <p class="overview">
+            {{memory.description}}
+        </p>
+
+        <a href="{{url_for('update', id=memory.id)}}" class="button">Update</a>
+        <a href="{{url_for('delete', id=memory.id)}}" class="button delete-button">Delete</a>
+
+      </div>
+    </div>
+  </div>
+    {% endfor %}
+</div>
+<div class="container text-center add">
+<a href="{{url_for('add')}}" class="button">Add Memory!</a>
+</div>
+
+{% endblock %}
