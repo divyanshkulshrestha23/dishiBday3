@@ -38,7 +38,7 @@ Bootstrap5(app)
 db = SQLAlchemy(model_class=Base)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DB_URI')
 db.init_app(app)
-app.config['UPLOADED_PHOTOS_DEST'] = os.path.join(basedir, 'static')
+app.config['UPLOADED_PHOTOS_DEST'] = os.path.join(basedir, 'uploads')
 migrate = Migrate(app, db)
 
 photos = UploadSet('photos', IMAGES)
@@ -121,34 +121,20 @@ def add():
         filename = secure_filename(file.filename)
         file_path = os.path.join(app.config['UPLOADED_PHOTOS_DEST'], filename)
         file.save(file_path)
-        img_path = file_path.replace("static/", "", 1)
-        #filename = photos.save(form.photo.data)
-        #file_url = photos.url(filename)
+        filename = photos.save(form.photo.data)
+        file_url = photos.url(filename)
         memoryAdded = Memories(
             title=form.Title.data,
             description=form.Description.data,
             review=form.Review.data,
-            image=img_path,
+            image=file_url,
             rating=form.Rating.data
         )
         db.session.add(memoryAdded)
         db.session.commit()
-                
-        # Open the image and save it to the database
-        #file_url = photos.url(filename)
-        #filename = photos.save(form.photo.data)
-        #file_url = photos.url(filename)
-        #if file:
         return redirect(url_for('home'))
     return render_template("add.html", form=form)
 
-
-@app.route('/memory/<int:memory_id>/image')
-def memory_image(memory_id):
-    memory = Memories.query.get_or_404(memory_id)
-    if memory.image:
-        return Response(memory.image, mimetype='image/jpeg')  # Change mimetype if needed
-    return 'No image found', 404
 
 
 if __name__ == '__main__':
