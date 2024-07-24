@@ -38,9 +38,8 @@ Bootstrap5(app)
 db = SQLAlchemy(model_class=Base)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DB_URI')
 db.init_app(app)
-app.config['UPLOADED_PHOTOS_DEST'] = os.path.join(basedir, 'uploads')
+app.config['UPLOADED_PHOTOS_DEST'] = os.path.join(basedir, 'static')
 migrate = Migrate(app, db)
-UPLOADS_DIR = os.path.join(app.root_path, 'uploads')
 
 photos = UploadSet('photos', IMAGES)
 configure_uploads(app, photos)
@@ -122,13 +121,14 @@ def add():
         filename = secure_filename(file.filename)
         file_path = os.path.join(app.config['UPLOADED_PHOTOS_DEST'], filename)
         file.save(file_path)
-        filename = photos.save(form.photo.data)
-        file_url = photos.url(filename)
+        img_path = file_path.replace("static/", "", 1)
+        #filename = photos.save(form.photo.data)
+        #file_url = photos.url(filename)
         memoryAdded = Memories(
             title=form.Title.data,
             description=form.Description.data,
             review=form.Review.data,
-            image=file_url,
+            image=url_for('static', filename = img_path")
             rating=form.Rating.data
         )
         db.session.add(memoryAdded)
