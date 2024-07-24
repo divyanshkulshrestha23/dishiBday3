@@ -54,7 +54,7 @@ class Memories(db.Model):
     review: Mapped[str] = mapped_column(String(500), nullable=False)
     rating: Mapped[float] = mapped_column(Float, nullable=True)
     ranking: Mapped[int] = mapped_column(Integer, nullable=True)
-    image: Mapped[str] = mapped_column(String(500), nullable=False)
+    image: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
 
 
 # CREATE FORM
@@ -117,12 +117,14 @@ def delete():
 def add():
     form = AddMemoryForm()
     if form.validate_on_submit():
-        file = form.photo.data
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(app.config['UPLOADED_PHOTOS_DEST'], filename)
-        file.save(file_path)
+        image_file = form.photo.data
+        image_data = image_file.read()
+        #file = form.photo.data
+        #filename = secure_filename(file.filename)
+        #file_path = os.path.join(app.config['UPLOADED_PHOTOS_DEST'], filename)
+        #file.save(file_path)
         # Open the image and save it to the database
-        file_url = photos.url(filename)
+        #file_url = photos.url(filename)
         #filename = photos.save(form.photo.data)
         #file_url = photos.url(filename)
         #if file:
@@ -131,13 +133,21 @@ def add():
             title=form.Title.data,
             description=form.Description.data,
             review=form.Review.data,
-            image=file_url,
+            image=image_data,
             rating=form.Rating.data
         )
         db.session.add(memoryAdded)
         db.session.commit()
         return redirect(url_for('home'))
     return render_template("add.html", form=form)
+
+
+@app.route('/memory/<int:memory_id>/image')
+def memory_image(memory_id):
+    memory = Memories.query.get_or_404(memory_id)
+    if memory.image:
+        return Response(memory.image, mimetype='image/jpeg')  # Change mimetype if needed
+    return 'No image found', 404
 
 
 if __name__ == '__main__':
