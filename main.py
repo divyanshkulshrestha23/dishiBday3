@@ -128,7 +128,7 @@ def add():
             title=form.Title.data,
             description=form.Description.data,
             review=form.Review.data,
-            image=url_for('static', filename = img_path),
+            image=img_path,
             rating=form.Rating.data
         )
         db.session.add(memoryAdded)
