@@ -117,10 +117,10 @@ def delete():
 def add():
     form = AddMemoryForm()
     if form.validate_on_submit():
-        file = form.photo.data
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(app.config['UPLOADED_PHOTOS_DEST'], filename)
-        file.save(file_path)
+        #file = form.photo.data
+        #filename = secure_filename(file.filename)
+        #file_path = os.path.join(app.config['UPLOADED_PHOTOS_DEST'], filename)
+        #file.save(file_path)
         filename = photos.save(form.photo.data)
         file_url = photos.url(filename)
         memoryAdded = Memories(
