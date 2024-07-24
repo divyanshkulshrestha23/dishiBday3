@@ -123,7 +123,7 @@ def add():
             title=form.Title.data,
             description=form.Description.data,
             review=form.Review.data,
-            image=image_data,
+            image=file_url,
             rating=form.Rating.data
         )
         db.session.add(memoryAdded)
