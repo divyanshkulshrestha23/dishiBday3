@@ -117,27 +117,27 @@ def delete():
 def add():
     form = AddMemoryForm()
     if form.validate_on_submit():
-        image_file = form.photo.data
-        image_data = image_file.read()
-        #file = form.photo.data
-        #filename = secure_filename(file.filename)
-        #file_path = os.path.join(app.config['UPLOADED_PHOTOS_DEST'], filename)
-        #file.save(file_path)
+        file = form.photo.data
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOADED_PHOTOS_DEST'], filename)
+        file.save(file_path)
+        with open(file_path, 'rb') as f:
+            image_data = f.read()
+            memoryAdded = Memories(
+                title=form.Title.data,
+                description=form.Description.data,
+                review=form.Review.data,
+                image=image_data,
+                rating=form.Rating.data
+            )
+            db.session.add(memoryAdded)
+            db.session.commit()
+                
         # Open the image and save it to the database
         #file_url = photos.url(filename)
         #filename = photos.save(form.photo.data)
         #file_url = photos.url(filename)
         #if file:
-
-        memoryAdded = Memories(
-            title=form.Title.data,
-            description=form.Description.data,
-            review=form.Review.data,
-            image=image_data,
-            rating=form.Rating.data
-        )
-        db.session.add(memoryAdded)
-        db.session.commit()
         return redirect(url_for('home'))
     return render_template("add.html", form=form)
 
