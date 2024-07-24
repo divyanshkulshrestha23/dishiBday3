@@ -54,7 +54,7 @@ class Memories(db.Model):
     review: Mapped[str] = mapped_column(String(500), nullable=False)
     rating: Mapped[float] = mapped_column(Float, nullable=True)
     ranking: Mapped[int] = mapped_column(Integer, nullable=True)
-    image: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
+    image: Mapped[str] = mapped_column(String(500), nullable=False)
 
 
 # CREATE FORM
@@ -117,21 +117,17 @@ def delete():
 def add():
     form = AddMemoryForm()
     if form.validate_on_submit():
-        file = form.photo.data
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(app.config['UPLOADED_PHOTOS_DEST'], filename)
-        file.save(file_path)
-        with open(file_path, 'rb') as f:
-            image_data = f.read()
-            memoryAdded = Memories(
-                title=form.Title.data,
-                description=form.Description.data,
-                review=form.Review.data,
-                image=image_data,
-                rating=form.Rating.data
-            )
-            db.session.add(memoryAdded)
-            db.session.commit()
+        filename = photos.save(form.photo.data)
+        file_url = photos.url(filename)
+        memoryAdded = Memories(
+            title=form.Title.data,
+            description=form.Description.data,
+            review=form.Review.data,
+            image=image_data,
+            rating=form.Rating.data
+        )
+        db.session.add(memoryAdded)
+        db.session.commit()
                 
         # Open the image and save it to the database
         #file_url = photos.url(filename)
