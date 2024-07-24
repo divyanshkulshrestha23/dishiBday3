@@ -54,7 +54,7 @@ class Memories(db.Model):
     review: Mapped[str] = mapped_column(String(500), nullable=False)
     rating: Mapped[float] = mapped_column(Float, nullable=True)
     ranking: Mapped[int] = mapped_column(Integer, nullable=True)
-    image: Mapped[bytes] = mapped_column(String(500), nullable=False)
+    image: Mapped[str] = mapped_column(String(500), nullable=False)
 
 
 # CREATE FORM
@@ -117,17 +117,16 @@ def delete():
 def add():
     form = AddMemoryForm()
     if form.validate_on_submit():
-        filename = photos.save(form.photo.data)
+        file = form.photo.data
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOADED_PHOTOS_DEST'], filename)
+        file.save(file_path)
+        # Open the image and save it to the database
         file_url = photos.url(filename)
+        #filename = photos.save(form.photo.data)
+        #file_url = photos.url(filename)
         #if file:
-            #filename = secure_filename(file.filename)
-            #file_path = os.path.join(app.config['UPLOADED_PHOTOS_DEST'], filename)
-            #file.save(file_path)
-            #filename = secure_filename(file.filename)
-            #file_path = os.path.join(app.config['UPLOADED_PHOTOS_DEST'], filename)
-            #file.save(file_path)
-            # Open the image and save it to the database
-            #file_url = photos.url(filename)
+
         memoryAdded = Memories(
             title=form.Title.data,
             description=form.Description.data,
@@ -142,4 +141,4 @@ def add():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
