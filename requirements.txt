@@ -10,3 +10,4 @@ gunicorn==21.2.0
 psycopg2-binary==2.9.9
 flask_uploads==0.2.1
 flask_migrate==4.0.7
+boto3==1.34.149
