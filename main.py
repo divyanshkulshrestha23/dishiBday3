@@ -151,7 +151,7 @@ def add():
         #file.save(file_path)
         #filename = photos.save(form.photo.data)
         #file_url = photos.url(filename)
-        image_file = form.image.data
+        image_file = form.photo.data
         image_url = upload_to_s3(image_file, app.config["S3_BUCKET_NAME"])
         memoryAdded = Memories(
             title=form.Title.data,
