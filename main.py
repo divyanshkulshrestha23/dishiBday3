@@ -25,6 +25,7 @@ pip3 install -r requirements.txt
 This will install the packages from requirements.txt for this project.
 '''
 
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -44,6 +45,33 @@ migrate = Migrate(app, db)
 photos = UploadSet('photos', IMAGES)
 configure_uploads(app, photos)
 patch_request_class(app)
+
+app.config['AWS_ACCESS_KEY_ID'] = os.environ.get('AWS_ACCESS_KEY_ID')
+app.config['AWS_SECRET_ACCESS_KEY'] = os.environ.get('AWS_SECRET_ACCESS_KEY')
+app.config['S3_BUCKET_NAME'] = os.environ.get('S3_BUCKET_NAME')
+
+def upload_to_s3(file, bucket_name, acl="public-read"):
+    s3 = boto3.client(
+        "s3",
+        aws_access_key_id=app.config["AWS_ACCESS_KEY_ID"],
+        aws_secret_access_key=app.config["AWS_SECRET_ACCESS_KEY"]
+    )
+
+    try:
+        s3.upload_fileobj(
+            file,
+            bucket_name,
+            file.filename,
+            ExtraArgs={
+                "ACL": acl,
+                "ContentType": file.content_type
+            }
+        )
+    except Exception as e:
+        print("Something Happened: ", e)
+        return e
+
+    return f"https://{bucket_name}.s3.amazonaws.com/{file.filename}"
 
 
 # CREATE DB
@@ -121,13 +149,15 @@ def add():
         #filename = secure_filename(file.filename)
         #file_path = os.path.join(app.config['UPLOADED_PHOTOS_DEST'], filename)
         #file.save(file_path)
-        filename = photos.save(form.photo.data)
-        file_url = photos.url(filename)
+        #filename = photos.save(form.photo.data)
+        #file_url = photos.url(filename)
+        image_file = form.image.data
+        image_url = upload_to_s3(image_file, app.config["S3_BUCKET_NAME"])
         memoryAdded = Memories(
             title=form.Title.data,
             description=form.Description.data,
             review=form.Review.data,
-            image=file_url,
+            image=image_url,
             rating=form.Rating.data
         )
         db.session.add(memoryAdded)
