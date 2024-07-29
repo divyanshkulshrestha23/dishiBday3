@@ -127,7 +127,7 @@ def update():
     memorySelected = db.get_or_404(Memories, memoryID)
     if form.validate_on_submit():
         memorySelected.rating = form.Rating.data
-        memorySelected.description = form.description.data
+        memorySelected.description = form.Description.data
         db.session.commit()
         return redirect(url_for('home'))
     return render_template("edit.html", memory=memorySelected, form=form)
